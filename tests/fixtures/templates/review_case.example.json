@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "case_id": "synthetic-case-001",
+  "document_id": "synthetic-document-001",
+  "document_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "review_item_id": "authorization-letter",
+  "expected_status": "needs_review",
+  "evidence": {
+    "page_number": 1,
+    "section_path": [
+      "Submission",
+      "Attachments"
+    ],
+    "excerpt": "Synthetic evidence text for automated tests only."
+  },
+  "provenance": {
+    "source_type": "synthetic",
+    "contains_real_business_data": false
+  }
+}

@@ -1,0 +1,5362 @@
+{
+  "components": {
+    "schemas": {
+      "ActorKind": {
+        "enum": [
+          "human",
+          "system",
+          "ai"
+        ],
+        "title": "ActorKind",
+        "type": "string"
+      },
+      "ApiIndexResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "api_version": {
+            "const": "v1",
+            "default": "v1",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "version"
+        ],
+        "title": "ApiIndexResponse",
+        "type": "object"
+      },
+      "AttemptFailure": {
+        "additionalProperties": false,
+        "properties": {
+          "call_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Id"
+          },
+          "code": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "phase": {
+            "enum": [
+              "root_cause",
+              "candidate_generation",
+              "evaluation",
+              "staging"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "phase",
+          "code",
+          "message",
+          "retryable"
+        ],
+        "title": "AttemptFailure",
+        "type": "object"
+      },
+      "AttemptStatus": {
+        "enum": [
+          "STARTED",
+          "EVALUATING",
+          "COMPLETED",
+          "FAILED",
+          "WAITING_HUMAN"
+        ],
+        "title": "AttemptStatus",
+        "type": "string"
+      },
+      "AuditActor": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Actor Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ActorKind"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "actor_id"
+        ],
+        "title": "AuditActor",
+        "type": "object"
+      },
+      "AuditEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Action",
+            "type": "string"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/AuditActor"
+          },
+          "after_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After Sha256"
+          },
+          "before_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before Sha256"
+          },
+          "call_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Call Id",
+            "type": "string"
+          },
+          "event_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Event Id",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/AuditProvenance"
+          },
+          "request_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id",
+            "type": "string"
+          },
+          "resource": {
+            "$ref": "#/components/schemas/AuditResource"
+          },
+          "result": {
+            "$ref": "#/components/schemas/AuditResult"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "event_id",
+          "actor",
+          "action",
+          "resource",
+          "provenance",
+          "call_id",
+          "request_id",
+          "occurred_at",
+          "result"
+        ],
+        "title": "AuditEvent",
+        "type": "object"
+      },
+      "AuditProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_sha256s": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Artifact Sha256S",
+            "type": "array"
+          },
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/ReportSourceType"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "provisional",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_type",
+          "status",
+          "claims_allowed"
+        ],
+        "title": "AuditProvenance",
+        "type": "object"
+      },
+      "AuditResource": {
+        "additionalProperties": false,
+        "properties": {
+          "resource_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Resource Id",
+            "type": "string"
+          },
+          "resource_type": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Resource Type",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "resource_type",
+          "resource_id"
+        ],
+        "title": "AuditResource",
+        "type": "object"
+      },
+      "AuditResult": {
+        "enum": [
+          "succeeded",
+          "rejected",
+          "failed"
+        ],
+        "title": "AuditResult",
+        "type": "string"
+      },
+      "Body_upload_document_api_v1_documents_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "source_document_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Source Document Id",
+            "type": "string"
+          },
+          "source_system": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Source System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "source_system",
+          "source_document_id"
+        ],
+        "title": "Body_upload_document_api_v1_documents_post",
+        "type": "object"
+      },
+      "CandidateChange": {
+        "additionalProperties": false,
+        "properties": {
+          "after_json": {
+            "title": "After Json",
+            "type": "string"
+          },
+          "before_json": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before Json"
+          },
+          "path": {
+            "maxLength": 512,
+            "minLength": 2,
+            "title": "Path",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "scope": {
+            "enum": [
+              "content",
+              "execution_config"
+            ],
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "path",
+          "after_json"
+        ],
+        "title": "CandidateChange",
+        "type": "object"
+      },
+      "CandidateProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_number": {
+            "minimum": 1.0,
+            "title": "Attempt Number",
+            "type": "integer"
+          },
+          "base_rule_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Base Rule Version Id",
+            "type": "string"
+          },
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/ExecutionHashes"
+          },
+          "optimization_job_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Optimization Job Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_artifact_sha256s": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Source Artifact Sha256S",
+            "type": "array"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType"
+          },
+          "status": {
+            "enum": [
+              "provisional",
+              "verified"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "optimization_job_id",
+          "attempt_number",
+          "base_rule_version_id",
+          "dataset_version_id",
+          "hashes",
+          "source_type",
+          "status",
+          "claims_allowed",
+          "source_artifact_sha256s"
+        ],
+        "title": "CandidateProvenance",
+        "type": "object"
+      },
+      "CandidateType": {
+        "enum": [
+          "RETRIEVAL_CONFIG",
+          "EXTRACTION_PROMPT_SCHEMA",
+          "TOOL_CONFIG",
+          "RULE_CONTENT",
+          "STABILITY_CONFIG"
+        ],
+        "title": "CandidateType",
+        "type": "string"
+      },
+      "CheckpointState": {
+        "additionalProperties": false,
+        "description": "Structured checkpoint state that avoids leaking unbounded JSON dictionaries.",
+        "properties": {
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "values": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CheckpointValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "title": "CheckpointState",
+        "type": "object"
+      },
+      "CheckpointValue": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Key",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "value": {
+            "maxLength": 10000,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "title": "CheckpointValue",
+        "type": "object"
+      },
+      "ComponentCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "ComponentCheck",
+        "type": "object"
+      },
+      "CreateReviewJobRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "document_sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Document Sha256",
+            "type": "string"
+          },
+          "document_snapshot_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Document Snapshot Id",
+            "type": "string"
+          },
+          "execution_spec": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewExecutionSpecDraft"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "max_attempts": {
+            "default": 3,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "model_config_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Model Config Hash",
+            "type": "string"
+          },
+          "model_config_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Model Config Id",
+            "type": "string"
+          },
+          "rule_version_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Rule Version Hash",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_snapshot_id",
+          "document_sha256",
+          "rule_version_id",
+          "rule_version_hash",
+          "model_config_id",
+          "model_config_hash"
+        ],
+        "title": "CreateReviewJobRequest",
+        "type": "object"
+      },
+      "CreateRuleVersionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "change_summary": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Change Summary",
+            "type": "string"
+          },
+          "content": {
+            "additionalProperties": true,
+            "title": "Content",
+            "type": "object"
+          },
+          "execution_config": {
+            "additionalProperties": true,
+            "title": "Execution Config",
+            "type": "object"
+          },
+          "parent_version_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Version Id"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/RuleProvenance"
+          },
+          "rule_key": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Rule Key",
+            "type": "string"
+          },
+          "rule_set_description": {
+            "anyOf": [
+              {
+                "maxLength": 8000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Set Description"
+          },
+          "rule_set_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Rule Set Name",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule_key",
+          "rule_set_name",
+          "content",
+          "change_summary",
+          "provenance"
+        ],
+        "title": "CreateRuleVersionRequest",
+        "type": "object"
+      },
+      "DecisionOutcome": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "$ref": "#/components/schemas/HumanDecision"
+          },
+          "finding": {
+            "$ref": "#/components/schemas/Finding"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "finding",
+          "decision"
+        ],
+        "title": "DecisionOutcome",
+        "type": "object"
+      },
+      "DocumentIdentity": {
+        "additionalProperties": false,
+        "properties": {
+          "document_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Document Id",
+            "type": "string"
+          },
+          "document_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Document Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_id",
+          "document_sha256"
+        ],
+        "title": "DocumentIdentity",
+        "type": "object"
+      },
+      "DocumentSnapshotResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "created": {
+            "title": "Created",
+            "type": "boolean"
+          },
+          "file_name": {
+            "title": "File Name",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "media_type": {
+            "title": "Media Type",
+            "type": "string"
+          },
+          "parse_status": {
+            "title": "Parse Status",
+            "type": "string"
+          },
+          "parser_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parser Name"
+          },
+          "parser_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parser Version"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "source_document_id": {
+            "title": "Source Document Id",
+            "type": "string"
+          },
+          "source_system": {
+            "title": "Source System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_system",
+          "source_document_id",
+          "file_name",
+          "sha256",
+          "size_bytes",
+          "media_type",
+          "parse_status",
+          "created"
+        ],
+        "title": "DocumentSnapshotResponse",
+        "type": "object"
+      },
+      "ErrorCategory": {
+        "enum": [
+          "retryable",
+          "permanent",
+          "cancelled",
+          "insufficient_evidence",
+          "not_found",
+          "conflict",
+          "invalid_request",
+          "internal"
+        ],
+        "title": "ErrorCategory",
+        "type": "string"
+      },
+      "EvaluateRuleVersionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset_version_id"
+        ],
+        "title": "EvaluateRuleVersionRequest",
+        "type": "object"
+      },
+      "EvaluationGate": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "evaluation_run_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluation Run Id"
+          },
+          "gate_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Gate Id",
+            "type": "string"
+          },
+          "gate_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Gate Sha256",
+            "type": "string"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "report_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Sha256"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EvaluationGateStatus"
+          }
+        },
+        "required": [
+          "gate_id",
+          "rule_version_id",
+          "dataset_version_id",
+          "status",
+          "provisional",
+          "claims_allowed",
+          "requested_at",
+          "gate_sha256"
+        ],
+        "title": "EvaluationGate",
+        "type": "object"
+      },
+      "EvaluationGateStatus": {
+        "enum": [
+          "PENDING",
+          "PASSED",
+          "FAILED",
+          "PROVISIONAL"
+        ],
+        "title": "EvaluationGateStatus",
+        "type": "string"
+      },
+      "EvaluationReport": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "human_annotation_cases": {
+            "minimum": 0.0,
+            "title": "Human Annotation Cases",
+            "type": "integer"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Limitations",
+            "type": "array"
+          },
+          "report_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Report Sha256",
+            "type": "string"
+          },
+          "required_human_cases": {
+            "minimum": 0.0,
+            "title": "Required Human Cases",
+            "type": "integer"
+          },
+          "run_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/ReportSection"
+            },
+            "title": "Sections",
+            "type": "array"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/ReportSourceType"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "provisional",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "source_type",
+          "status",
+          "claims_allowed",
+          "human_annotation_cases",
+          "required_human_cases",
+          "sections",
+          "limitations",
+          "generated_at",
+          "report_sha256"
+        ],
+        "title": "EvaluationReport",
+        "type": "object"
+      },
+      "EvaluationRun": {
+        "additionalProperties": false,
+        "properties": {
+          "call_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Call Id",
+            "type": "string"
+          },
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "code_version_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Code Version Id",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "config_artifact_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Config Artifact Id",
+            "type": "string"
+          },
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/EvaluationRunHashes"
+          },
+          "input_artifact_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Input Artifact Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "provenance_status": {
+            "enum": [
+              "verified",
+              "provisional",
+              "unknown"
+            ],
+            "title": "Provenance Status",
+            "type": "string"
+          },
+          "report_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Report Sha256",
+            "type": "string"
+          },
+          "request_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Request Id",
+            "type": "string"
+          },
+          "results_artifact_id": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Results Artifact Id",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/ReportSourceType"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          }
+        },
+        "required": [
+          "run_id",
+          "name",
+          "source_type",
+          "status",
+          "provenance_status",
+          "claims_allowed",
+          "dataset_version_id",
+          "input_artifact_id",
+          "results_artifact_id",
+          "config_artifact_id",
+          "code_version_id",
+          "hashes",
+          "call_id",
+          "request_id",
+          "started_at",
+          "report_sha256"
+        ],
+        "title": "EvaluationRun",
+        "type": "object"
+      },
+      "EvaluationRunHashes": {
+        "additionalProperties": false,
+        "properties": {
+          "code_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Code Sha256",
+            "type": "string"
+          },
+          "config_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Config Sha256",
+            "type": "string"
+          },
+          "dataset_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Dataset Sha256",
+            "type": "string"
+          },
+          "input_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Input Sha256",
+            "type": "string"
+          },
+          "results_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Results Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "dataset_sha256",
+          "input_sha256",
+          "results_sha256",
+          "config_sha256",
+          "code_sha256"
+        ],
+        "title": "EvaluationRunHashes",
+        "type": "object"
+      },
+      "EvidenceReference": {
+        "additionalProperties": false,
+        "properties": {
+          "chunk_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Chunk Id",
+            "type": "string"
+          },
+          "document_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Document Id",
+            "type": "string"
+          },
+          "excerpt": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "page_end": {
+            "anyOf": [
+              {
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page End"
+          },
+          "page_number": {
+            "minimum": 1.0,
+            "title": "Page Number",
+            "type": "integer"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "section_path": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 32,
+            "title": "Section Path",
+            "type": "array"
+          },
+          "text_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Text Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "chunk_id",
+          "page_number",
+          "excerpt",
+          "text_sha256"
+        ],
+        "title": "EvidenceReference",
+        "type": "object"
+      },
+      "ExecutionArtifactReference": {
+        "additionalProperties": false,
+        "description": "Bounded pointer to immutable object storage content.",
+        "properties": {
+          "artifact_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Artifact Id",
+            "type": "string"
+          },
+          "bucket": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Bucket",
+            "type": "string"
+          },
+          "object_key": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Object Key",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id",
+          "bucket",
+          "object_key",
+          "sha256"
+        ],
+        "title": "ExecutionArtifactReference",
+        "type": "object"
+      },
+      "ExecutionHashes": {
+        "additionalProperties": false,
+        "properties": {
+          "dataset_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Dataset Sha256",
+            "type": "string"
+          },
+          "input_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Input Sha256",
+            "type": "string"
+          },
+          "model_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Model Sha256",
+            "type": "string"
+          },
+          "prompt_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Prompt Sha256",
+            "type": "string"
+          },
+          "retriever_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Retriever Sha256",
+            "type": "string"
+          },
+          "rule_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Rule Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "tool_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Tool Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "input_sha256",
+          "rule_sha256",
+          "dataset_sha256",
+          "model_sha256",
+          "prompt_sha256",
+          "retriever_sha256",
+          "tool_sha256"
+        ],
+        "title": "ExecutionHashes",
+        "type": "object"
+      },
+      "FailureSignals": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_conflict": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Conflict"
+          },
+          "evidence_in_top_k": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence In Top K"
+          },
+          "extraction_matches_expected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extraction Matches Expected"
+          },
+          "failure_summary": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Failure Summary",
+            "type": "string"
+          },
+          "label_conflict": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label Conflict"
+          },
+          "repeated_outputs_consistent": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Repeated Outputs Consistent"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "tool_matches_expected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Matches Expected"
+          }
+        },
+        "required": [
+          "failure_summary"
+        ],
+        "title": "FailureSignals",
+        "type": "object"
+      },
+      "Finding": {
+        "additionalProperties": false,
+        "properties": {
+          "conclusion": {
+            "anyOf": [
+              {
+                "enum": [
+                  "compliant",
+                  "noncompliant"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conclusion"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentIdentity"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Documents",
+            "type": "array"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/EvidenceReference"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "finding_content_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Finding Content Sha256",
+            "type": "string"
+          },
+          "finding_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "human_approval_allowed": {
+            "default": true,
+            "title": "Human Approval Allowed",
+            "type": "boolean"
+          },
+          "message": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/FindingProvenance"
+          },
+          "review_item_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Review Item Id",
+            "type": "string"
+          },
+          "review_job_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Review Job Id",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FindingStatus"
+          },
+          "workflow_state": {
+            "$ref": "#/components/schemas/FindingWorkflowState"
+          }
+        },
+        "required": [
+          "finding_id",
+          "review_job_id",
+          "rule_version_id",
+          "review_item_id",
+          "workflow_state",
+          "status",
+          "message",
+          "documents",
+          "provenance",
+          "created_at",
+          "finding_content_sha256"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "FindingProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "retrieval_results_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Retrieval Results Sha256",
+            "type": "string"
+          },
+          "retrieval_variant": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Retrieval Variant",
+            "type": "string"
+          },
+          "review_input_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Review Input Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_kind": {
+            "enum": [
+              "provisional_retrieval",
+              "verified_retrieval"
+            ],
+            "title": "Source Kind",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "provisional",
+              "verified"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_kind",
+          "status",
+          "claims_allowed",
+          "dataset_version_id",
+          "review_input_sha256",
+          "retrieval_results_sha256",
+          "retrieval_variant"
+        ],
+        "title": "FindingProvenance",
+        "type": "object"
+      },
+      "FindingRevision": {
+        "additionalProperties": false,
+        "properties": {
+          "conclusion": {
+            "enum": [
+              "compliant",
+              "noncompliant"
+            ],
+            "title": "Conclusion",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceReference"
+            },
+            "minItems": 1,
+            "title": "Evidence",
+            "type": "array"
+          },
+          "message": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "conclusion",
+          "message",
+          "evidence"
+        ],
+        "title": "FindingRevision",
+        "type": "object"
+      },
+      "FindingStatus": {
+        "enum": [
+          "PENDING_DECISION",
+          "WORK_ITEM_OPEN",
+          "APPROVED",
+          "REJECTED",
+          "MODIFIED",
+          "INSUFFICIENT_EVIDENCE"
+        ],
+        "title": "FindingStatus",
+        "type": "string"
+      },
+      "FindingWorkflowState": {
+        "enum": [
+          "DONE",
+          "NEED_MORE_EVIDENCE",
+          "WAITING_HUMAN"
+        ],
+        "title": "FindingWorkflowState",
+        "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HumanDecision": {
+        "additionalProperties": false,
+        "properties": {
+          "decided_at": {
+            "format": "date-time",
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decision": {
+            "$ref": "#/components/schemas/HumanDecisionType"
+          },
+          "decision_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Decision Id",
+            "type": "string"
+          },
+          "decision_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Decision Sha256",
+            "type": "string"
+          },
+          "evidence_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Evidence Sha256",
+            "type": "string"
+          },
+          "finding_content_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Finding Content Sha256",
+            "type": "string"
+          },
+          "finding_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "review_input_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Review Input Sha256",
+            "type": "string"
+          },
+          "reviewer_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Reviewer Id",
+            "type": "string"
+          },
+          "reviewer_kind": {
+            "const": "human",
+            "default": "human",
+            "title": "Reviewer Kind",
+            "type": "string"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FindingRevision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "supersedes_decision_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes Decision Id"
+          }
+        },
+        "required": [
+          "decision_id",
+          "finding_id",
+          "reviewer_id",
+          "decision",
+          "reason",
+          "decided_at",
+          "review_input_sha256",
+          "finding_content_sha256",
+          "evidence_sha256",
+          "decision_sha256"
+        ],
+        "title": "HumanDecision",
+        "type": "object"
+      },
+      "HumanDecisionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "decision": {
+            "$ref": "#/components/schemas/HumanDecisionType"
+          },
+          "reason": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "reviewer_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Reviewer Id",
+            "type": "string"
+          },
+          "reviewer_kind": {
+            "const": "human",
+            "default": "human",
+            "title": "Reviewer Kind",
+            "type": "string"
+          },
+          "revision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FindingRevision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "supersedes_decision_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes Decision Id"
+          }
+        },
+        "required": [
+          "reviewer_id",
+          "decision",
+          "reason"
+        ],
+        "title": "HumanDecisionRequest",
+        "type": "object"
+      },
+      "HumanDecisionType": {
+        "enum": [
+          "APPROVE",
+          "REJECT",
+          "MODIFY",
+          "INSUFFICIENT_EVIDENCE"
+        ],
+        "title": "HumanDecisionType",
+        "type": "string"
+      },
+      "JobCheckpoint": {
+        "additionalProperties": false,
+        "properties": {
+          "completed_at": {
+            "format": "date-time",
+            "title": "Completed At",
+            "type": "string"
+          },
+          "job_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Job Id",
+            "type": "string"
+          },
+          "lease_token": {
+            "minimum": 0.0,
+            "title": "Lease Token",
+            "type": "integer"
+          },
+          "node_name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Node Name",
+            "type": "string"
+          },
+          "output_artifact_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Artifact Id"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sequence": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/ReviewStage"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CheckpointState"
+          }
+        },
+        "required": [
+          "job_id",
+          "node_name",
+          "stage",
+          "lease_token",
+          "state",
+          "completed_at"
+        ],
+        "title": "JobCheckpoint",
+        "type": "object"
+      },
+      "JobFailure": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "$ref": "#/components/schemas/ErrorCategory"
+          },
+          "code": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "retryable": {
+            "title": "Retryable",
+            "type": "boolean"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "category",
+          "retryable"
+        ],
+        "title": "JobFailure",
+        "type": "object"
+      },
+      "JobLifecycle": {
+        "enum": [
+          "QUEUED",
+          "RUNNING",
+          "WAITING_HUMAN",
+          "COMPLETED",
+          "RETRY_WAIT",
+          "FAILED",
+          "DEAD",
+          "CANCELLED"
+        ],
+        "title": "JobLifecycle",
+        "type": "string"
+      },
+      "JointRegressionResult": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/RegressionCaseOutcome"
+            },
+            "minItems": 1,
+            "title": "Outcomes",
+            "type": "array"
+          },
+          "protection_gate_passed": {
+            "title": "Protection Gate Passed",
+            "type": "boolean"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "report_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Report Sha256",
+            "type": "string"
+          },
+          "required_stability_runs": {
+            "maximum": 20.0,
+            "minimum": 2.0,
+            "title": "Required Stability Runs",
+            "type": "integer"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "stability_gate_passed": {
+            "title": "Stability Gate Passed",
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RegressionStatus"
+          },
+          "target_gate_passed": {
+            "title": "Target Gate Passed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "required_stability_runs",
+          "outcomes",
+          "target_gate_passed",
+          "protection_gate_passed",
+          "stability_gate_passed",
+          "status",
+          "provisional",
+          "claims_allowed",
+          "report_sha256"
+        ],
+        "title": "JointRegressionResult",
+        "type": "object"
+      },
+      "LivenessResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "version"
+        ],
+        "title": "LivenessResponse",
+        "type": "object"
+      },
+      "MetricStatus": {
+        "enum": [
+          "measured",
+          "provisional",
+          "unknown"
+        ],
+        "title": "MetricStatus",
+        "type": "string"
+      },
+      "OptimizationAttempt": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "attempt_number": {
+            "minimum": 1.0,
+            "title": "Attempt Number",
+            "type": "integer"
+          },
+          "candidate_rule_version_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Rule Version Id"
+          },
+          "candidates": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/OptimizationCandidate"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "checkpoint_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Checkpoint Sha256",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "evaluations": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/JointRegressionResult"
+            },
+            "title": "Evaluations",
+            "type": "array"
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttemptFailure"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "optimization_job_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Optimization Job Id",
+            "type": "string"
+          },
+          "root_cause": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RootCauseDecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "selected_candidate_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selected Candidate Id"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AttemptStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "optimization_job_id",
+          "attempt_number",
+          "status",
+          "started_at",
+          "updated_at",
+          "checkpoint_sha256"
+        ],
+        "title": "OptimizationAttempt",
+        "type": "object"
+      },
+      "OptimizationCandidate": {
+        "additionalProperties": false,
+        "properties": {
+          "affected_protection_sample_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Affected Protection Sample Ids",
+            "type": "array"
+          },
+          "candidate_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "candidate_type": {
+            "$ref": "#/components/schemas/CandidateType"
+          },
+          "change": {
+            "$ref": "#/components/schemas/CandidateChange"
+          },
+          "content_json": {
+            "minLength": 2,
+            "title": "Content Json",
+            "type": "string"
+          },
+          "execution_config_json": {
+            "minLength": 2,
+            "title": "Execution Config Json",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/CandidateProvenance"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          },
+          "root_cause": {
+            "$ref": "#/components/schemas/RootCause"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "target_sample_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Target Sample Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "candidate_type",
+          "root_cause",
+          "content_json",
+          "execution_config_json",
+          "change",
+          "rationale",
+          "target_sample_ids",
+          "provenance"
+        ],
+        "title": "OptimizationCandidate",
+        "type": "object"
+      },
+      "OptimizationJob": {
+        "additionalProperties": false,
+        "properties": {
+          "base_rule_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Base Rule Version Id",
+            "type": "string"
+          },
+          "candidate_rule_version_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Rule Version Id"
+          },
+          "candidates_per_round": {
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Candidates Per Round",
+            "type": "integer"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "current_round": {
+            "minimum": 0.0,
+            "title": "Current Round",
+            "type": "integer"
+          },
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "failure_trajectory": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AttemptFailure"
+            },
+            "title": "Failure Trajectory",
+            "type": "array"
+          },
+          "hashes": {
+            "$ref": "#/components/schemas/ExecutionHashes"
+          },
+          "last_checkpoint_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checkpoint Sha256"
+          },
+          "max_rounds": {
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Max Rounds",
+            "type": "integer"
+          },
+          "optimization_job_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Optimization Job Id",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/OptimizationProvenance"
+          },
+          "required_stability_runs": {
+            "maximum": 20.0,
+            "minimum": 2.0,
+            "title": "Required Stability Runs",
+            "type": "integer"
+          },
+          "samples": {
+            "items": {
+              "$ref": "#/components/schemas/OptimizationSample"
+            },
+            "minItems": 2,
+            "title": "Samples",
+            "type": "array"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OptimizationStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "optimization_job_id",
+          "base_rule_version_id",
+          "dataset_version_id",
+          "status",
+          "max_rounds",
+          "candidates_per_round",
+          "required_stability_runs",
+          "current_round",
+          "samples",
+          "hashes",
+          "provenance",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "OptimizationJob",
+        "type": "object"
+      },
+      "OptimizationProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "human_annotation_cases": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Human Annotation Cases",
+            "type": "integer"
+          },
+          "required_human_cases": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Required Human Cases",
+            "type": "integer"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/SourceArtifact"
+            },
+            "minItems": 1,
+            "title": "Source Artifacts",
+            "type": "array"
+          },
+          "source_description": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Source Description",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType"
+          },
+          "status": {
+            "enum": [
+              "provisional",
+              "verified"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_type",
+          "status",
+          "claims_allowed",
+          "source_description",
+          "source_artifacts"
+        ],
+        "title": "OptimizationProvenance",
+        "type": "object"
+      },
+      "OptimizationSample": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "document_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Document Id",
+            "type": "string"
+          },
+          "document_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Document Sha256",
+            "type": "string"
+          },
+          "evidence_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Evidence Sha256",
+            "type": "string"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Id"
+          },
+          "human_decision_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Human Decision Id"
+          },
+          "provenance_status": {
+            "enum": [
+              "provisional",
+              "verified"
+            ],
+            "title": "Provenance Status",
+            "type": "string"
+          },
+          "review_input_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Review Input Sha256",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/SampleRole"
+          },
+          "sample_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Sample Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "signals": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FailureSignals"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source_reference": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Source Reference",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType"
+          }
+        },
+        "required": [
+          "sample_id",
+          "role",
+          "document_id",
+          "document_sha256",
+          "source_type",
+          "provenance_status",
+          "claims_allowed",
+          "source_reference",
+          "review_input_sha256",
+          "evidence_sha256"
+        ],
+        "title": "OptimizationSample",
+        "type": "object"
+      },
+      "OptimizationStatus": {
+        "enum": [
+          "PENDING",
+          "RUNNING",
+          "WAITING_APPROVAL",
+          "WAITING_HUMAN",
+          "OPTIMIZATION_FAILED",
+          "CANCELLED"
+        ],
+        "title": "OptimizationStatus",
+        "type": "string"
+      },
+      "OptimizeRuleVersionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates_per_round": {
+            "default": 2,
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Candidates Per Round",
+            "type": "integer"
+          },
+          "dataset_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "max_rounds": {
+            "default": 3,
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Max Rounds",
+            "type": "integer"
+          },
+          "model_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Model Sha256",
+            "type": "string"
+          },
+          "prompt_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Prompt Sha256",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/OptimizationProvenance"
+          },
+          "required_stability_runs": {
+            "default": 2,
+            "maximum": 20.0,
+            "minimum": 2.0,
+            "title": "Required Stability Runs",
+            "type": "integer"
+          },
+          "retriever_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Retriever Sha256",
+            "type": "string"
+          },
+          "samples": {
+            "items": {
+              "$ref": "#/components/schemas/OptimizationSample"
+            },
+            "minItems": 2,
+            "title": "Samples",
+            "type": "array"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "tool_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Tool Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dataset_version_id",
+          "model_sha256",
+          "prompt_sha256",
+          "retriever_sha256",
+          "tool_sha256",
+          "samples",
+          "provenance"
+        ],
+        "title": "OptimizeRuleVersionRequest",
+        "type": "object"
+      },
+      "PublishRuleVersionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "approver_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Approver Id",
+            "type": "string"
+          },
+          "approver_kind": {
+            "const": "human",
+            "default": "human",
+            "title": "Approver Kind",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "approver_id"
+        ],
+        "title": "PublishRuleVersionRequest",
+        "type": "object"
+      },
+      "ReadinessResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "checks": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ComponentCheck"
+            },
+            "title": "Checks",
+            "type": "object"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "service",
+          "version",
+          "checks"
+        ],
+        "title": "ReadinessResponse",
+        "type": "object"
+      },
+      "RegressionCaseOutcome": {
+        "additionalProperties": false,
+        "properties": {
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "result_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Result Sha256",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/SampleRole"
+          },
+          "run_number": {
+            "minimum": 1.0,
+            "title": "Run Number",
+            "type": "integer"
+          },
+          "sample_id": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Sample Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sample_id",
+          "role",
+          "run_number",
+          "passed",
+          "result_sha256"
+        ],
+        "title": "RegressionCaseOutcome",
+        "type": "object"
+      },
+      "RegressionStatus": {
+        "enum": [
+          "PASSED",
+          "FAILED",
+          "PROVISIONAL"
+        ],
+        "title": "RegressionStatus",
+        "type": "string"
+      },
+      "ReportMetric": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "collected": {
+            "title": "Collected",
+            "type": "boolean"
+          },
+          "interpretation": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "metric_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Metric Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/ReportSourceType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MetricStatus"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "metric_id",
+          "label",
+          "source_type",
+          "status",
+          "claims_allowed",
+          "collected",
+          "interpretation"
+        ],
+        "title": "ReportMetric",
+        "type": "object"
+      },
+      "ReportSection": {
+        "additionalProperties": false,
+        "properties": {
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/ReportMetric"
+            },
+            "title": "Metrics",
+            "type": "array"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "section_id": {
+            "enum": [
+              "conclusion",
+              "evidence",
+              "engineering",
+              "cost"
+            ],
+            "title": "Section Id",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "section_id",
+          "title",
+          "metrics"
+        ],
+        "title": "ReportSection",
+        "type": "object"
+      },
+      "ReportSourceType": {
+        "enum": [
+          "real",
+          "provisional",
+          "synthetic",
+          "external-platform"
+        ],
+        "title": "ReportSourceType",
+        "type": "string"
+      },
+      "ReviewExecutionSpec": {
+        "additionalProperties": false,
+        "description": "Immutable, self-verifying inputs required to rebuild one review execution.",
+        "properties": {
+          "chunk_artifact": {
+            "$ref": "#/components/schemas/ExecutionArtifactReference"
+          },
+          "dataset_version_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Dataset Version Hash",
+            "type": "string"
+          },
+          "dataset_version_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "document_sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Document Sha256",
+            "type": "string"
+          },
+          "document_snapshot_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Document Snapshot Id",
+            "type": "string"
+          },
+          "index_artifact": {
+            "$ref": "#/components/schemas/ExecutionArtifactReference"
+          },
+          "input_sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Input Sha256",
+            "type": "string"
+          },
+          "job_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Job Id",
+            "type": "string"
+          },
+          "model_config_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Model Config Hash",
+            "type": "string"
+          },
+          "model_config_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Model Config Id",
+            "type": "string"
+          },
+          "query": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "retrieval_variant": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Retrieval Variant",
+            "type": "string"
+          },
+          "retriever_artifact": {
+            "$ref": "#/components/schemas/ExecutionArtifactReference"
+          },
+          "rule_version_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Rule Version Hash",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_snapshot_id",
+          "document_sha256",
+          "rule_version_id",
+          "rule_version_hash",
+          "dataset_version_id",
+          "dataset_version_hash",
+          "model_config_id",
+          "model_config_hash",
+          "query",
+          "retrieval_variant",
+          "retriever_artifact",
+          "index_artifact",
+          "chunk_artifact",
+          "job_id",
+          "input_sha256"
+        ],
+        "title": "ReviewExecutionSpec",
+        "type": "object"
+      },
+      "ReviewExecutionSpecDraft": {
+        "additionalProperties": false,
+        "description": "Versioned execution inputs supplied before a job ID has been allocated.",
+        "properties": {
+          "chunk_artifact": {
+            "$ref": "#/components/schemas/ExecutionArtifactReference"
+          },
+          "dataset_version_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Dataset Version Hash",
+            "type": "string"
+          },
+          "dataset_version_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Dataset Version Id",
+            "type": "string"
+          },
+          "document_sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Document Sha256",
+            "type": "string"
+          },
+          "document_snapshot_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Document Snapshot Id",
+            "type": "string"
+          },
+          "index_artifact": {
+            "$ref": "#/components/schemas/ExecutionArtifactReference"
+          },
+          "model_config_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Model Config Hash",
+            "type": "string"
+          },
+          "model_config_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Model Config Id",
+            "type": "string"
+          },
+          "query": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "retrieval_variant": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Retrieval Variant",
+            "type": "string"
+          },
+          "retriever_artifact": {
+            "$ref": "#/components/schemas/ExecutionArtifactReference"
+          },
+          "rule_version_hash": {
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Rule Version Hash",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "document_snapshot_id",
+          "document_sha256",
+          "rule_version_id",
+          "rule_version_hash",
+          "dataset_version_id",
+          "dataset_version_hash",
+          "model_config_id",
+          "model_config_hash",
+          "query",
+          "retrieval_variant",
+          "retriever_artifact",
+          "index_artifact",
+          "chunk_artifact"
+        ],
+        "title": "ReviewExecutionSpecDraft",
+        "type": "object"
+      },
+      "ReviewJobResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_count": {
+            "title": "Attempt Count",
+            "type": "integer"
+          },
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_snapshot_id": {
+            "title": "Document Snapshot Id",
+            "type": "string"
+          },
+          "execution_spec_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Spec Sha256"
+          },
+          "failure": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JobFailure"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure_stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "input_fingerprint": {
+            "title": "Input Fingerprint",
+            "type": "string"
+          },
+          "lease_token": {
+            "title": "Lease Token",
+            "type": "integer"
+          },
+          "max_attempts": {
+            "title": "Max Attempts",
+            "type": "integer"
+          },
+          "model_config_id": {
+            "title": "Model Config Id",
+            "type": "string"
+          },
+          "rerun_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rerun Of"
+          },
+          "rule_version_id": {
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobLifecycle"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "document_snapshot_id",
+          "rule_version_id",
+          "model_config_id",
+          "input_fingerprint",
+          "status",
+          "attempt_count",
+          "max_attempts",
+          "available_at",
+          "lease_token",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ReviewJobResponse",
+        "type": "object"
+      },
+      "ReviewStage": {
+        "enum": [
+          "PARSING",
+          "INDEXING",
+          "RETRIEVING",
+          "EXTRACTING",
+          "COMPARING",
+          "VERIFYING",
+          "REPORTING"
+        ],
+        "title": "ReviewStage",
+        "type": "string"
+      },
+      "RollbackRuleSetRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "approver_id": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Approver Id",
+            "type": "string"
+          },
+          "approver_kind": {
+            "const": "human",
+            "default": "human",
+            "title": "Approver Kind",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "target_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Target Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_version_id",
+          "approver_id",
+          "reason"
+        ],
+        "title": "RollbackRuleSetRequest",
+        "type": "object"
+      },
+      "RootCause": {
+        "enum": [
+          "RETRIEVAL_MISS",
+          "EXTRACTION_ERROR",
+          "TOOL_ERROR",
+          "RULE_GAP",
+          "MODEL_INSTABILITY",
+          "LABEL_UNCERTAIN"
+        ],
+        "title": "RootCause",
+        "type": "string"
+      },
+      "RootCauseDecision": {
+        "additionalProperties": false,
+        "properties": {
+          "call_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Id"
+          },
+          "classifier": {
+            "enum": [
+              "deterministic",
+              "llm"
+            ],
+            "title": "Classifier",
+            "type": "string"
+          },
+          "rationale": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Rationale",
+            "type": "string"
+          },
+          "root_cause": {
+            "$ref": "#/components/schemas/RootCause"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "target_sample_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Target Sample Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "root_cause",
+          "classifier",
+          "rationale",
+          "target_sample_ids"
+        ],
+        "title": "RootCauseDecision",
+        "type": "object"
+      },
+      "RuleDiffChange": {
+        "additionalProperties": false,
+        "properties": {
+          "after_json": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "After Json"
+          },
+          "before_json": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Before Json"
+          },
+          "operation": {
+            "enum": [
+              "add",
+              "remove",
+              "replace"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "operation"
+        ],
+        "title": "RuleDiffChange",
+        "type": "object"
+      },
+      "RuleProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "dataset_version_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset Version Id"
+          },
+          "evidence_sha256s": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Sha256S",
+            "type": "array"
+          },
+          "review_input_sha256s": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Input Sha256S",
+            "type": "array"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_decision_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Decision Ids",
+            "type": "array"
+          },
+          "source_finding_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Finding Ids",
+            "type": "array"
+          },
+          "source_type": {
+            "enum": [
+              "manual",
+              "human_approved",
+              "optimization",
+              "provisional",
+              "synthetic"
+            ],
+            "title": "Source Type",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "provisional",
+              "verified"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_type",
+          "status",
+          "claims_allowed"
+        ],
+        "title": "RuleProvenance",
+        "type": "object"
+      },
+      "RuleVersion": {
+        "additionalProperties": false,
+        "properties": {
+          "change_summary": {
+            "maxLength": 8000,
+            "minLength": 1,
+            "title": "Change Summary",
+            "type": "string"
+          },
+          "content_json": {
+            "minLength": 2,
+            "title": "Content Json",
+            "type": "string"
+          },
+          "content_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Content Sha256",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "evaluation_gate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EvaluationGate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "execution_config_json": {
+            "minLength": 2,
+            "title": "Execution Config Json",
+            "type": "string"
+          },
+          "parent_version_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Version Id"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/RuleProvenance"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "published_by": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By"
+          },
+          "rule_set_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Rule Set Id",
+            "type": "string"
+          },
+          "rule_version_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Rule Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RuleVersionStatus"
+          },
+          "version_number": {
+            "minimum": 1.0,
+            "title": "Version Number",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule_version_id",
+          "rule_set_id",
+          "version_number",
+          "status",
+          "content_json",
+          "execution_config_json",
+          "content_sha256",
+          "change_summary",
+          "provenance",
+          "created_at"
+        ],
+        "title": "RuleVersion",
+        "type": "object"
+      },
+      "RuleVersionDiff": {
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/RuleDiffChange"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "from_version_id": {
+            "title": "From Version Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "to_version_id": {
+            "title": "To Version Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from_version_id",
+          "to_version_id",
+          "changes"
+        ],
+        "title": "RuleVersionDiff",
+        "type": "object"
+      },
+      "RuleVersionStatus": {
+        "enum": [
+          "DRAFT",
+          "OPTIMIZING",
+          "EVALUATING",
+          "WAITING_APPROVAL",
+          "PUBLISHED",
+          "REJECTED",
+          "ROLLED_BACK"
+        ],
+        "title": "RuleVersionStatus",
+        "type": "string"
+      },
+      "RunStatus": {
+        "enum": [
+          "running",
+          "completed",
+          "failed",
+          "unknown"
+        ],
+        "title": "RunStatus",
+        "type": "string"
+      },
+      "SampleRole": {
+        "enum": [
+          "TARGET",
+          "PROTECTION"
+        ],
+        "title": "SampleRole",
+        "type": "string"
+      },
+      "SourceArtifact": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "approval_opinion",
+              "platform_run",
+              "retrieval_report",
+              "manifest"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "path": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "kind"
+        ],
+        "title": "SourceArtifact",
+        "type": "object"
+      },
+      "SourceType": {
+        "enum": [
+          "REAL",
+          "EXTERNAL_PLATFORM",
+          "PROVISIONAL",
+          "SYNTHETIC"
+        ],
+        "title": "SourceType",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WorkbenchResourceIndex": {
+        "additionalProperties": false,
+        "properties": {
+          "claims_allowed": {
+            "title": "Claims Allowed",
+            "type": "boolean"
+          },
+          "demo_mode": {
+            "title": "Demo Mode",
+            "type": "boolean"
+          },
+          "environment": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Environment",
+            "type": "string"
+          },
+          "evaluation_run_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Evaluation Run Ids",
+            "type": "array"
+          },
+          "finding_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "human_annotation_cases": {
+            "minimum": 0.0,
+            "title": "Human Annotation Cases",
+            "type": "integer"
+          },
+          "optimization_job_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Optimization Job Ids",
+            "type": "array"
+          },
+          "required_human_cases": {
+            "minimum": 0.0,
+            "title": "Required Human Cases",
+            "type": "integer"
+          },
+          "review_job_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Job Ids",
+            "type": "array"
+          },
+          "rule_set_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Rule Set Ids",
+            "type": "array"
+          },
+          "schema_version": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/ReportSourceType"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "provisional",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "demo_mode",
+          "environment",
+          "source_type",
+          "status",
+          "claims_allowed",
+          "human_annotation_cases",
+          "required_human_cases",
+          "generated_at"
+        ],
+        "title": "WorkbenchResourceIndex",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Evidence-driven tender review application API",
+    "title": "Tender Review API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1": {
+      "get": {
+        "operationId": "index_response_api_v1_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiIndexResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Index Response",
+        "tags": [
+          "api"
+        ]
+      }
+    },
+    "/api/v1/audit-events": {
+      "get": {
+        "operationId": "list_audit_events_api_v1_audit_events_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEvent"
+                  },
+                  "title": "Response List Audit Events Api V1 Audit Events Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Audit Events",
+        "tags": [
+          "api",
+          "audit"
+        ]
+      }
+    },
+    "/api/v1/documents": {
+      "post": {
+        "operationId": "upload_document_api_v1_documents_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_document_api_v1_documents_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSnapshotResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Source or content hash conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Document",
+        "tags": [
+          "api",
+          "documents"
+        ]
+      }
+    },
+    "/api/v1/evaluation-runs/{run_id}": {
+      "get": {
+        "operationId": "get_evaluation_run_api_v1_evaluation_runs__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationRun"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Evaluation Run",
+        "tags": [
+          "api",
+          "evaluation"
+        ]
+      }
+    },
+    "/api/v1/evaluation-runs/{run_id}/report": {
+      "get": {
+        "operationId": "get_evaluation_report_api_v1_evaluation_runs__run_id__report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Evaluation Report",
+        "tags": [
+          "api",
+          "evaluation"
+        ]
+      }
+    },
+    "/api/v1/findings/{finding_id}": {
+      "get": {
+        "operationId": "get_finding_api_v1_findings__finding_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Finding"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Finding",
+        "tags": [
+          "api",
+          "findings"
+        ]
+      }
+    },
+    "/api/v1/findings/{finding_id}/decisions": {
+      "get": {
+        "operationId": "list_finding_decisions_api_v1_findings__finding_id__decisions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/HumanDecision"
+                  },
+                  "title": "Response List Finding Decisions Api V1 Findings  Finding Id  Decisions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Finding Decisions",
+        "tags": [
+          "api",
+          "findings"
+        ]
+      },
+      "post": {
+        "operationId": "submit_finding_decision_api_v1_findings__finding_id__decisions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HumanDecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionOutcome"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Submit Finding Decision",
+        "tags": [
+          "api",
+          "findings"
+        ]
+      }
+    },
+    "/api/v1/optimization-jobs/{optimization_job_id}": {
+      "get": {
+        "operationId": "get_optimization_job_api_v1_optimization_jobs__optimization_job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "optimization_job_id",
+            "required": true,
+            "schema": {
+              "title": "Optimization Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptimizationJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Optimization Job",
+        "tags": [
+          "api",
+          "optimization"
+        ]
+      }
+    },
+    "/api/v1/optimization-jobs/{optimization_job_id}/attempts": {
+      "get": {
+        "operationId": "list_optimization_attempts_api_v1_optimization_jobs__optimization_job_id__attempts_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "optimization_job_id",
+            "required": true,
+            "schema": {
+              "title": "Optimization Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OptimizationAttempt"
+                  },
+                  "title": "Response List Optimization Attempts Api V1 Optimization Jobs  Optimization Job Id  Attempts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Optimization Attempts",
+        "tags": [
+          "api",
+          "optimization"
+        ]
+      }
+    },
+    "/api/v1/optimization-jobs/{optimization_job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_optimization_job_api_v1_optimization_jobs__optimization_job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "optimization_job_id",
+            "required": true,
+            "schema": {
+              "title": "Optimization Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptimizationJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Optimization Job",
+        "tags": [
+          "api",
+          "optimization"
+        ]
+      }
+    },
+    "/api/v1/review-jobs": {
+      "post": {
+        "operationId": "create_review_job_api_v1_review_jobs_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Caller-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Caller-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Idempotency key conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Review Job",
+        "tags": [
+          "api",
+          "review-jobs"
+        ]
+      }
+    },
+    "/api/v1/review-jobs/{job_id}": {
+      "get": {
+        "operationId": "get_review_job_api_v1_review_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Review Job",
+        "tags": [
+          "api",
+          "review-jobs"
+        ]
+      }
+    },
+    "/api/v1/review-jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_review_job_api_v1_review_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Review Job",
+        "tags": [
+          "api",
+          "review-jobs"
+        ]
+      }
+    },
+    "/api/v1/review-jobs/{job_id}/checkpoints": {
+      "get": {
+        "operationId": "list_review_job_checkpoints_api_v1_review_jobs__job_id__checkpoints_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/JobCheckpoint"
+                  },
+                  "title": "Response List Review Job Checkpoints Api V1 Review Jobs  Job Id  Checkpoints Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Review Job Checkpoints",
+        "tags": [
+          "api",
+          "review-jobs"
+        ]
+      }
+    },
+    "/api/v1/review-jobs/{job_id}/execution-spec": {
+      "get": {
+        "operationId": "get_review_execution_spec_api_v1_review_jobs__job_id__execution_spec_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewExecutionSpec"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Review Execution Spec",
+        "tags": [
+          "api",
+          "review-jobs"
+        ]
+      }
+    },
+    "/api/v1/review-jobs/{job_id}/findings": {
+      "get": {
+        "operationId": "list_review_job_findings_api_v1_review_jobs__job_id__findings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Finding"
+                  },
+                  "title": "Response List Review Job Findings Api V1 Review Jobs  Job Id  Findings Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Review Job Findings",
+        "tags": [
+          "api",
+          "findings"
+        ]
+      }
+    },
+    "/api/v1/review-jobs/{job_id}/rerun": {
+      "post": {
+        "operationId": "rerun_review_job_api_v1_review_jobs__job_id__rerun_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rerun Review Job",
+        "tags": [
+          "api",
+          "review-jobs"
+        ]
+      }
+    },
+    "/api/v1/rule-sets/{rule_set_id}/rollback": {
+      "post": {
+        "operationId": "rollback_rule_set_api_v1_rule_sets__rule_set_id__rollback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_set_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Set Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RollbackRuleSetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rollback Rule Set",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rule-sets/{rule_set_id}/versions": {
+      "get": {
+        "operationId": "list_rule_versions_api_v1_rule_sets__rule_set_id__versions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_set_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Set Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RuleVersion"
+                  },
+                  "title": "Response List Rule Versions Api V1 Rule Sets  Rule Set Id  Versions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Rule Versions",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      },
+      "post": {
+        "operationId": "create_rule_version_api_v1_rule_sets__rule_set_id__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule_set_id",
+            "required": true,
+            "schema": {
+              "title": "Rule Set Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRuleVersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Rule Version",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rule-versions/{version_id}": {
+      "get": {
+        "operationId": "get_rule_version_api_v1_rule_versions__version_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Rule Version",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rule-versions/{version_id}/diff": {
+      "get": {
+        "operationId": "diff_rule_version_api_v1_rule_versions__version_id__diff_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "against_version_id",
+            "required": true,
+            "schema": {
+              "title": "Against Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersionDiff"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Diff Rule Version",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rule-versions/{version_id}/evaluate": {
+      "post": {
+        "operationId": "evaluate_rule_version_api_v1_rule_versions__version_id__evaluate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluateRuleVersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Evaluate Rule Version",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/rule-versions/{version_id}/optimize": {
+      "post": {
+        "operationId": "optimize_rule_version_api_v1_rule_versions__version_id__optimize_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptimizeRuleVersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptimizationJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Optimize Rule Version",
+        "tags": [
+          "api",
+          "optimization"
+        ]
+      }
+    },
+    "/api/v1/rule-versions/{version_id}/publish": {
+      "post": {
+        "operationId": "publish_rule_version_api_v1_rule_versions__version_id__publish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "title": "Version Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Call-ID",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Call-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishRuleVersionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleVersion"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Publish Rule Version",
+        "tags": [
+          "api",
+          "rules"
+        ]
+      }
+    },
+    "/api/v1/workbench": {
+      "get": {
+        "operationId": "get_workbench_index_api_v1_workbench_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkbenchResourceIndex"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Workbench Index",
+        "tags": [
+          "api",
+          "workbench"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "operationId": "live_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LivenessResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Live",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}
