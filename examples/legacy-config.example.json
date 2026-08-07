@@ -1,0 +1,14 @@
+{
+  "base_url": "https://api.example.invalid",
+  "username": "example-user",
+  "review_item": "example-rule",
+  "expected_issue": "Synthetic cross-section requirement mismatch",
+  "product_property": "tender-review",
+  "applicant_name": "local-review-client",
+  "clinical_evaluation": "not-applicable",
+  "llm": {
+    "base_url": "https://llm.example.invalid/v1",
+    "api_key": "replace-with-local-secret",
+    "model": "example-model"
+  }
+}

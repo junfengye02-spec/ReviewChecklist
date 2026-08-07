@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# FastAPI's in-process test client and the repository linter.
+httpx==0.28.1
+ruff==0.15.21

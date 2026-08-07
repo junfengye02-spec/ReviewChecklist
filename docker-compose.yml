@@ -1,0 +1,153 @@
+name: tender-review-local
+
+x-app-environment: &app-environment
+  TENDER_REVIEW_ENVIRONMENT: local
+  TENDER_REVIEW_ADAPTER_MODE: production
+  TENDER_REVIEW_LOG_LEVEL: ${TENDER_REVIEW_LOG_LEVEL:-INFO}
+  TENDER_REVIEW_LOG_JSON: "true"
+  TENDER_REVIEW_DATABASE_CONNECT_TIMEOUT_SECONDS: ${TENDER_REVIEW_DATABASE_CONNECT_TIMEOUT_SECONDS:-5}
+  TENDER_REVIEW_MINIO_TIMEOUT_SECONDS: ${TENDER_REVIEW_MINIO_TIMEOUT_SECONDS:-5}
+  TENDER_REVIEW_MINIO_MAX_ATTEMPTS: ${TENDER_REVIEW_MINIO_MAX_ATTEMPTS:-3}
+  TENDER_REVIEW_LLM_BASE_URL: ${TENDER_REVIEW_LLM_BASE_URL:-}
+  TENDER_REVIEW_LLM_API_KEY: ${TENDER_REVIEW_LLM_API_KEY:-}
+  TENDER_REVIEW_LLM_MODEL: ${TENDER_REVIEW_LLM_MODEL:-}
+  TENDER_REVIEW_LLM_TIMEOUT_SECONDS: ${TENDER_REVIEW_LLM_TIMEOUT_SECONDS:-30}
+  TENDER_REVIEW_LLM_MAX_ATTEMPTS: ${TENDER_REVIEW_LLM_MAX_ATTEMPTS:-3}
+  TENDER_REVIEW_LLM_TEMPERATURE: ${TENDER_REVIEW_LLM_TEMPERATURE:-0}
+  TENDER_REVIEW_MODEL_CONFIG_ID: ${TENDER_REVIEW_MODEL_CONFIG_ID:-openai-compatible-review-v1}
+  TENDER_REVIEW_MODEL_PROMPT_VERSION: ${TENDER_REVIEW_MODEL_PROMPT_VERSION:-structured-extraction-v1}
+  TENDER_REVIEW_EMBEDDING_BASE_URL: ${TENDER_REVIEW_EMBEDDING_BASE_URL:-}
+  TENDER_REVIEW_EMBEDDING_API_KEY: ${TENDER_REVIEW_EMBEDDING_API_KEY:-}
+  TENDER_REVIEW_EMBEDDING_MODEL: ${TENDER_REVIEW_EMBEDDING_MODEL:-}
+  TENDER_REVIEW_EMBEDDING_TIMEOUT_SECONDS: ${TENDER_REVIEW_EMBEDDING_TIMEOUT_SECONDS:-30}
+  TENDER_REVIEW_EMBEDDING_MAX_ATTEMPTS: ${TENDER_REVIEW_EMBEDDING_MAX_ATTEMPTS:-3}
+  TENDER_REVIEW_EMBEDDING_DIMENSIONS: ${TENDER_REVIEW_EMBEDDING_DIMENSIONS:-1536}
+  TENDER_REVIEW_EMBEDDING_BATCH_SIZE: ${TENDER_REVIEW_EMBEDDING_BATCH_SIZE:-64}
+  DATABASE_URL: mysql+pymysql://${MYSQL_USER:-tender_review}:${MYSQL_PASSWORD:-local-app-change-me}@mysql:3306/${MYSQL_DATABASE:-tender_review}?charset=utf8mb4
+  MINIO_ENDPOINT: minio:9000
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin-change-me}
+  MINIO_SECURE: "false"
+  MINIO_BUCKET: ${MINIO_BUCKET:-tender-review-artifacts}
+
+x-app-depends-on: &app-depends-on
+  mysql:
+    condition: service_healthy
+  minio-init:
+    condition: service_completed_successfully
+  migrate:
+    condition: service_completed_successfully
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-tender_review}
+      MYSQL_USER: ${MYSQL_USER:-tender_review}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-local-app-change-me}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-root-change-me}
+      TZ: ${TZ:-Asia/Shanghai}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysqladmin ping --host=127.0.0.1 --user=root --silent
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin-change-me}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  minio-init:
+    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin-change-me}
+      MINIO_BUCKET: ${MINIO_BUCKET:-tender-review-artifacts}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >-
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD" &&
+        mc mb --ignore-existing "local/$$MINIO_BUCKET" &&
+        mc anonymous set none "local/$$MINIO_BUCKET"
+
+  migrate:
+    build:
+      context: .
+    restart: "no"
+    environment:
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER:-tender_review}:${MYSQL_PASSWORD:-local-app-change-me}@mysql:3306/${MYSQL_DATABASE:-tender_review}?charset=utf8mb4
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  api:
+    build:
+      context: .
+    restart: unless-stopped
+    init: true
+    environment: *app-environment
+    command: ["uvicorn", "tender_review.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on: *app-depends-on
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3).read()
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  worker:
+    build:
+      context: .
+    restart: unless-stopped
+    init: true
+    environment: *app-environment
+    command: ["python", "-m", "tender_review.worker"]
+    depends_on: *app-depends-on
+    healthcheck:
+      test: ["CMD", "python", "-m", "tender_review.worker", "--check-readiness"]
+      interval: 10s
+      timeout: 8s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  mysql_data:
+  minio_data:

@@ -1,0 +1,14 @@
+alembic==1.18.5
+fastapi==0.139.0
+langchain-core==1.5.3
+langgraph==1.2.10
+langgraph-checkpoint==4.1.1
+minio==7.2.20
+openpyxl==3.1.5
+pydantic==2.13.4
+python-multipart==0.0.22
+PyMuPDF==1.26.3
+PyMySQL==1.2.0
+requests==2.34.2
+SQLAlchemy==2.0.51
+uvicorn==0.50.2
